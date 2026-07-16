@@ -26,9 +26,9 @@ resource "revenuecat_package_product" "web_monthly" {
 
 ### Required
 
-- `package_id` (String) RevenueCat package ID.
-- `product_id` (String) Existing RevenueCat product ID.
-- `project_id` (String) RevenueCat project ID.
+- `package_id` (String) RevenueCat package ID (1-255 characters).
+- `product_id` (String) Existing RevenueCat product ID (1-255 characters).
+- `project_id` (String) RevenueCat project ID (1-255 characters).
 
 ### Optional
 

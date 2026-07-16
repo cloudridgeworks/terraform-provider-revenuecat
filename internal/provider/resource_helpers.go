@@ -11,9 +11,60 @@ import (
 	"strings"
 
 	"github.com/cloudridgeworks/terraform-provider-revenuecat/internal/client"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 )
+
+const (
+	maxIdentifierLength  = 255
+	maxLookupKeyLength   = 200
+	maxDisplayNameLength = 1500
+	maxWebhookURLLength  = 5000
+)
+
+func identifierValidators() []validator.String {
+	return []validator.String{stringvalidator.UTF8LengthBetween(1, maxIdentifierLength)}
+}
+
+func lookupKeyValidators() []validator.String {
+	return []validator.String{stringvalidator.UTF8LengthBetween(1, maxLookupKeyLength)}
+}
+
+func displayNameValidators() []validator.String {
+	return []validator.String{stringvalidator.UTF8LengthBetween(1, maxDisplayNameLength)}
+}
+
+func webhookURLValidators() []validator.String {
+	return []validator.String{
+		stringvalidator.UTF8LengthBetween(1, maxWebhookURLLength),
+		absoluteURIValidator{},
+	}
+}
+
+var _ validator.String = absoluteURIValidator{}
+
+type absoluteURIValidator struct{}
+
+func (absoluteURIValidator) Description(_ context.Context) string {
+	return "value must be a valid absolute URI"
+}
+
+func (v absoluteURIValidator) MarkdownDescription(ctx context.Context) string {
+	return v.Description(ctx)
+}
+
+func (v absoluteURIValidator) ValidateString(ctx context.Context, req validator.StringRequest, resp *validator.StringResponse) {
+	if req.ConfigValue.IsNull() || req.ConfigValue.IsUnknown() {
+		return
+	}
+
+	parsed, err := url.ParseRequestURI(req.ConfigValue.ValueString())
+	if err != nil || parsed.Scheme == "" || parsed.Host == "" {
+		resp.Diagnostics.AddAttributeError(req.Path, "Invalid URI", v.Description(ctx))
+	}
+}
 
 func escaped(parts ...string) string {
 	encoded := make([]string, len(parts))

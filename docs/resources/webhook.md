@@ -28,15 +28,15 @@ resource "revenuecat_webhook" "subscription_events" {
 ### Required
 
 - `name` (String) Webhook display name.
-- `project_id` (String) RevenueCat project ID.
-- `url` (String) HTTPS endpoint that receives RevenueCat events.
+- `project_id` (String) RevenueCat project ID (1-255 characters).
+- `url` (String) Valid absolute endpoint URI that receives RevenueCat events (maximum 5000 characters).
 
 ### Optional
 
-- `app_id` (String) Optional RevenueCat app ID scope.
+- `app_id` (String) Optional RevenueCat app ID scope (1-255 characters).
 - `authorization_header` (String, Sensitive) Optional Authorization header sent with webhook requests.
 - `environment` (String) Optional `production` or `sandbox` event filter.
-- `event_types` (Set of String) Optional set of RevenueCat webhook event types.
+- `event_types` (Set of String) Optional set of RevenueCat webhook event names. Common values include `INITIAL_PURCHASE`, `RENEWAL`, `CANCELLATION`, `EXPIRATION`, `BILLING_ISSUE`, `PRODUCT_CHANGE`, and `TRANSFER`. Values are intentionally not restricted so newly introduced RevenueCat event types can be used without a provider release.
 
 ### Read-Only
 

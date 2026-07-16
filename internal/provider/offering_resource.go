@@ -49,11 +49,11 @@ func (r *OfferingResource) Metadata(_ context.Context, req resource.MetadataRequ
 }
 
 func (r *OfferingResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
-	resp.Schema = schema.Schema{MarkdownDescription: "A RevenueCat offering.", Attributes: map[string]schema.Attribute{
-		"project_id":   schema.StringAttribute{Required: true, MarkdownDescription: "RevenueCat project ID.", PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()}},
+	resp.Schema = schema.Schema{MarkdownDescription: "A RevenueCat offering. RevenueCat offering metadata is not currently managed by this resource.", Attributes: map[string]schema.Attribute{
+		"project_id":   schema.StringAttribute{Required: true, MarkdownDescription: "RevenueCat project ID (1-255 characters).", Validators: identifierValidators(), PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()}},
 		"id":           schema.StringAttribute{Computed: true, MarkdownDescription: "RevenueCat offering ID.", PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()}},
-		"lookup_key":   schema.StringAttribute{Required: true, MarkdownDescription: "Stable offering lookup key.", PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()}},
-		"display_name": schema.StringAttribute{Required: true, MarkdownDescription: "Human-readable offering name."},
+		"lookup_key":   schema.StringAttribute{Required: true, MarkdownDescription: "Stable offering lookup key (1-200 characters).", Validators: lookupKeyValidators(), PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()}},
+		"display_name": schema.StringAttribute{Required: true, MarkdownDescription: "Human-readable offering name (1-1500 characters).", Validators: displayNameValidators()},
 		"is_current":   schema.BoolAttribute{Optional: true, Computed: true, Default: booldefault.StaticBool(false), MarkdownDescription: "Whether this is the project's current offering."},
 		"state":        schema.StringAttribute{Computed: true, MarkdownDescription: "RevenueCat lifecycle state."},
 		"created_at":   schema.Int64Attribute{Computed: true, MarkdownDescription: "Creation time in milliseconds since Unix epoch."},

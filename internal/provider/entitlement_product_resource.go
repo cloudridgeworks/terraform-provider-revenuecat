@@ -40,9 +40,9 @@ func (r *EntitlementProductResource) Metadata(_ context.Context, req resource.Me
 func (r *EntitlementProductResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	replace := []planmodifier.String{stringplanmodifier.RequiresReplace()}
 	resp.Schema = schema.Schema{MarkdownDescription: "Attaches an existing RevenueCat product to an entitlement.", Attributes: map[string]schema.Attribute{
-		"project_id":     schema.StringAttribute{Required: true, MarkdownDescription: "RevenueCat project ID.", PlanModifiers: replace},
-		"entitlement_id": schema.StringAttribute{Required: true, MarkdownDescription: "RevenueCat entitlement ID.", PlanModifiers: replace},
-		"product_id":     schema.StringAttribute{Required: true, MarkdownDescription: "Existing RevenueCat product ID.", PlanModifiers: replace},
+		"project_id":     schema.StringAttribute{Required: true, MarkdownDescription: "RevenueCat project ID (1-255 characters).", Validators: identifierValidators(), PlanModifiers: replace},
+		"entitlement_id": schema.StringAttribute{Required: true, MarkdownDescription: "RevenueCat entitlement ID (1-255 characters).", Validators: identifierValidators(), PlanModifiers: replace},
+		"product_id":     schema.StringAttribute{Required: true, MarkdownDescription: "Existing RevenueCat product ID (1-255 characters).", Validators: identifierValidators(), PlanModifiers: replace},
 		"id":             schema.StringAttribute{Computed: true, MarkdownDescription: "Stable association identifier.", PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()}},
 	}}
 }
@@ -107,7 +107,7 @@ func (r *EntitlementProductResource) Delete(ctx context.Context, req resource.De
 
 func (r *EntitlementProductResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
 	parts := strings.Split(req.ID, "/")
-	if len(parts) != 3 {
+	if len(parts) != 3 || parts[0] == "" || parts[1] == "" || parts[2] == "" {
 		resp.Diagnostics.AddError("Invalid import identifier", "Expected project_id/entitlement_id/product_id")
 		return
 	}

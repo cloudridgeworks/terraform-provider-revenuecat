@@ -3,12 +3,12 @@
 page_title: "revenuecat_offering Resource - revenuecat"
 subcategory: ""
 description: |-
-  A RevenueCat offering.
+  A RevenueCat offering. RevenueCat offering metadata is not currently managed by this resource.
 ---
 
 # revenuecat_offering (Resource)
 
-A RevenueCat offering.
+A RevenueCat offering. RevenueCat offering metadata is not currently managed by this resource.
 
 ## Example Usage
 
@@ -26,9 +26,9 @@ resource "revenuecat_offering" "default" {
 
 ### Required
 
-- `display_name` (String) Human-readable offering name.
-- `lookup_key` (String) Stable offering lookup key.
-- `project_id` (String) RevenueCat project ID.
+- `display_name` (String) Human-readable offering name (1-1500 characters).
+- `lookup_key` (String) Stable offering lookup key (1-200 characters).
+- `project_id` (String) RevenueCat project ID (1-255 characters).
 
 ### Optional
 
