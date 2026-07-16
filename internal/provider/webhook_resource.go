@@ -197,6 +197,8 @@ func setWebhookState(ctx context.Context, data *WebhookResourceModel, remote web
 	}
 	if remote.SigningSecret != "" {
 		data.SigningSecret = types.StringValue(remote.SigningSecret)
+	} else if data.SigningSecret.IsUnknown() {
+		data.SigningSecret = types.StringNull()
 	}
 	data.CreatedAt = types.Int64Value(remote.CreatedAt)
 	return nil
