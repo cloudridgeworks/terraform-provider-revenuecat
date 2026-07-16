@@ -1,4 +1,4 @@
-// Copyright Cloud Ridge Works
+// Copyright Cloud Ridge Works 2026
 // SPDX-License-Identifier: MPL-2.0
 
 package provider
