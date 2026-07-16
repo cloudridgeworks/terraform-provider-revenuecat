@@ -100,6 +100,19 @@ Generated provider documentation lives in [`docs`](docs). Releases use the
 scaffold's GoReleaser workflow and require a configured GPG signing key before
 publishing to the Terraform Registry.
 
+Please read [`CONTRIBUTING.md`](CONTRIBUTING.md) before opening an issue or pull
+request. Security vulnerabilities should be reported privately as described in
+[`SECURITY.md`](SECURITY.md).
+
+## Publishing
+
+The repository is prepared to publish the same signed GitHub release artifacts
+to both registries. See [`PUBLISHING.md`](PUBLISHING.md) for the one-time GPG and
+registry setup, first-release checklist, and subsequent release process.
+
 ## License
 
-Mozilla Public License 2.0. See [`LICENSE`](LICENSE).
+This project is licensed under the [Mozilla Public License 2.0](LICENSE).
+Contributions are accepted under the same license; no contributor license
+agreement is currently required. See [`NOTICE`](NOTICE) for attribution and
+trademark information.

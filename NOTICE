@@ -1,0 +1,14 @@
+Terraform Provider for RevenueCat
+Copyright (c) 2026 Cloud Ridge Works
+
+Portions of this project are derived from HashiCorp's
+terraform-provider-scaffolding-framework and retain their original copyright
+notices. The project is distributed under the Mozilla Public License 2.0; see
+LICENSE for the complete terms.
+
+RevenueCat is a trademark of RevenueCat, Inc. Terraform and HashiCorp are
+trademarks of HashiCorp, Inc. OpenTofu is a trademark of The Linux Foundation.
+All other trademarks belong to their respective owners.
+
+This independent community provider is not affiliated with, sponsored by, or
+endorsed by RevenueCat, HashiCorp, or the OpenTofu project.
