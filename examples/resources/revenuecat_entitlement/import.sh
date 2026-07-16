@@ -1,0 +1,1 @@
+terraform import revenuecat_entitlement.pro proj_example/entl_example

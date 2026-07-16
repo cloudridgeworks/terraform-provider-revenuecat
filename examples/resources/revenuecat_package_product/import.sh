@@ -1,0 +1,1 @@
+terraform import revenuecat_package_product.web_monthly proj_example/pkge_example/prod_example

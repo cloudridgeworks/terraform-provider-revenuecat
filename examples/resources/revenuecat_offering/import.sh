@@ -1,0 +1,1 @@
+terraform import revenuecat_offering.default proj_example/ofrng_example

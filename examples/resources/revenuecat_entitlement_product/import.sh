@@ -1,0 +1,1 @@
+terraform import revenuecat_entitlement_product.web_monthly proj_example/entl_example/prod_example

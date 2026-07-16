@@ -1,0 +1,10 @@
+---
+schema: 1.1
+
+partition: tf-ecosystem
+
+summary:
+  owner: cloudridgeworks
+  description: |
+    Terraform and OpenTofu provider for RevenueCat REST API v2 project configuration.
+  visibility: public

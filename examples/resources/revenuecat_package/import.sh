@@ -1,0 +1,1 @@
+terraform import revenuecat_package.monthly proj_example/ofrng_example/pkge_example
