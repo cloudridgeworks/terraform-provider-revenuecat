@@ -1,0 +1,67 @@
+name: Bug report
+description: Report incorrect provider behavior or unexpected drift.
+title: "bug: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: Do not include RevenueCat API keys, signing secrets, customer data, or other sensitive values.
+  - type: input
+    id: provider-version
+    attributes:
+      label: Provider version
+      placeholder: v0.1.0
+    validations:
+      required: true
+  - type: input
+    id: cli-version
+    attributes:
+      label: Terraform or OpenTofu version
+      placeholder: Terraform 1.14.0 or OpenTofu 1.11.0
+    validations:
+      required: true
+  - type: dropdown
+    id: resource
+    attributes:
+      label: Resource
+      options:
+        - revenuecat_entitlement
+        - revenuecat_offering
+        - revenuecat_package
+        - revenuecat_entitlement_product
+        - revenuecat_package_product
+        - revenuecat_webhook
+        - Provider configuration
+        - Release or installation
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: configuration
+    attributes:
+      label: Minimal configuration
+      description: Remove or replace all IDs and secrets.
+      render: hcl
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Expected and observed behavior
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant sanitized logs
+      render: text
+  - type: checkboxes
+    id: confirmation
+    attributes:
+      label: Confirmation
+      options:
+        - label: I searched existing issues and removed all sensitive values.
+          required: true
+        - label: This is not a security vulnerability; security reports follow SECURITY.md.
+          required: true

@@ -25,9 +25,9 @@ resource "revenuecat_entitlement" "pro" {
 
 ### Required
 
-- `display_name` (String) Human-readable entitlement name.
-- `lookup_key` (String) Stable entitlement lookup key.
-- `project_id` (String) RevenueCat project ID.
+- `display_name` (String) Human-readable entitlement name (1-1500 characters).
+- `lookup_key` (String) Stable entitlement lookup key (1-200 characters).
+- `project_id` (String) RevenueCat project ID (1-255 characters).
 
 ### Read-Only
 

@@ -1,4 +1,4 @@
-// Copyright Cloud Ridge Works
+// Copyright Cloud Ridge Works 2026
 // SPDX-License-Identifier: MPL-2.0
 
 package provider
@@ -9,11 +9,13 @@ import (
 	"net/http"
 
 	"github.com/cloudridgeworks/terraform-provider-revenuecat/internal/client"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -55,14 +57,14 @@ func (r *WebhookResource) Metadata(_ context.Context, req resource.MetadataReque
 
 func (r *WebhookResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{MarkdownDescription: "A RevenueCat webhook integration.", Attributes: map[string]schema.Attribute{
-		"project_id":           schema.StringAttribute{Required: true, MarkdownDescription: "RevenueCat project ID.", PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()}},
+		"project_id":           schema.StringAttribute{Required: true, MarkdownDescription: "RevenueCat project ID (1-255 characters).", Validators: identifierValidators(), PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()}},
 		"id":                   schema.StringAttribute{Computed: true, MarkdownDescription: "RevenueCat webhook integration ID.", PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()}},
 		"name":                 schema.StringAttribute{Required: true, MarkdownDescription: "Webhook display name."},
-		"url":                  schema.StringAttribute{Required: true, MarkdownDescription: "HTTPS endpoint that receives RevenueCat events."},
+		"url":                  schema.StringAttribute{Required: true, MarkdownDescription: "Valid absolute endpoint URI that receives RevenueCat events (maximum 5000 characters).", Validators: webhookURLValidators()},
 		"authorization_header": schema.StringAttribute{Optional: true, Sensitive: true, MarkdownDescription: "Optional Authorization header sent with webhook requests."},
-		"environment":          schema.StringAttribute{Optional: true, MarkdownDescription: "Optional `production` or `sandbox` event filter."},
-		"event_types":          schema.SetAttribute{Optional: true, ElementType: types.StringType, MarkdownDescription: "Optional set of RevenueCat webhook event types."},
-		"app_id":               schema.StringAttribute{Optional: true, MarkdownDescription: "Optional RevenueCat app ID scope."},
+		"environment":          schema.StringAttribute{Optional: true, MarkdownDescription: "Optional `production` or `sandbox` event filter.", Validators: []validator.String{stringvalidator.OneOf("production", "sandbox")}},
+		"event_types":          schema.SetAttribute{Optional: true, ElementType: types.StringType, MarkdownDescription: "Optional set of RevenueCat webhook event names. Common values include `INITIAL_PURCHASE`, `RENEWAL`, `CANCELLATION`, `EXPIRATION`, `BILLING_ISSUE`, `PRODUCT_CHANGE`, and `TRANSFER`. Values are intentionally not restricted so newly introduced RevenueCat event types can be used without a provider release."},
+		"app_id":               schema.StringAttribute{Optional: true, MarkdownDescription: "Optional RevenueCat app ID scope (1-255 characters).", Validators: identifierValidators()},
 		"signing_secret":       schema.StringAttribute{Computed: true, Sensitive: true, MarkdownDescription: "RevenueCat webhook signing secret."},
 		"created_at":           schema.Int64Attribute{Computed: true, MarkdownDescription: "Creation time in milliseconds since Unix epoch."},
 	}}

@@ -1,4 +1,4 @@
-// Copyright Cloud Ridge Works
+// Copyright Cloud Ridge Works 2026
 // SPDX-License-Identifier: MPL-2.0
 
 package provider
@@ -10,12 +10,14 @@ import (
 	"strings"
 
 	"github.com/cloudridgeworks/terraform-provider-revenuecat/internal/client"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -42,10 +44,10 @@ func (r *PackageProductResource) Metadata(_ context.Context, req resource.Metada
 func (r *PackageProductResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	replace := []planmodifier.String{stringplanmodifier.RequiresReplace()}
 	resp.Schema = schema.Schema{MarkdownDescription: "Attaches an existing RevenueCat product to a package.", Attributes: map[string]schema.Attribute{
-		"project_id":           schema.StringAttribute{Required: true, MarkdownDescription: "RevenueCat project ID.", PlanModifiers: replace},
-		"package_id":           schema.StringAttribute{Required: true, MarkdownDescription: "RevenueCat package ID.", PlanModifiers: replace},
-		"product_id":           schema.StringAttribute{Required: true, MarkdownDescription: "Existing RevenueCat product ID.", PlanModifiers: replace},
-		"eligibility_criteria": schema.StringAttribute{Optional: true, Computed: true, Default: stringdefault.StaticString("all"), MarkdownDescription: "One of `all`, `google_sdk_lt_6`, or `google_sdk_ge_6`.", PlanModifiers: replace},
+		"project_id":           schema.StringAttribute{Required: true, MarkdownDescription: "RevenueCat project ID (1-255 characters).", Validators: identifierValidators(), PlanModifiers: replace},
+		"package_id":           schema.StringAttribute{Required: true, MarkdownDescription: "RevenueCat package ID (1-255 characters).", Validators: identifierValidators(), PlanModifiers: replace},
+		"product_id":           schema.StringAttribute{Required: true, MarkdownDescription: "Existing RevenueCat product ID (1-255 characters).", Validators: identifierValidators(), PlanModifiers: replace},
+		"eligibility_criteria": schema.StringAttribute{Optional: true, Computed: true, Default: stringdefault.StaticString("all"), MarkdownDescription: "One of `all`, `google_sdk_lt_6`, or `google_sdk_ge_6`.", Validators: []validator.String{stringvalidator.OneOf("all", "google_sdk_lt_6", "google_sdk_ge_6")}, PlanModifiers: replace},
 		"id":                   schema.StringAttribute{Computed: true, MarkdownDescription: "Stable association identifier.", PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()}},
 	}}
 }
@@ -112,7 +114,7 @@ func (r *PackageProductResource) Delete(ctx context.Context, req resource.Delete
 
 func (r *PackageProductResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
 	parts := strings.Split(req.ID, "/")
-	if len(parts) != 3 {
+	if len(parts) != 3 || parts[0] == "" || parts[1] == "" || parts[2] == "" {
 		resp.Diagnostics.AddError("Invalid import identifier", "Expected project_id/package_id/product_id")
 		return
 	}

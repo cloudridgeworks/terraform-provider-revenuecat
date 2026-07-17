@@ -3,12 +3,12 @@
 page_title: "revenuecat_package Resource - revenuecat"
 subcategory: ""
 description: |-
-  A package within a RevenueCat offering.
+  A package within a RevenueCat offering. Imports require project_id/offering_id/package_id: RevenueCat reads packages by project and package ID, while the provider retains offering_id so an imported package can be recreated under the same parent if replacement is required.
 ---
 
 # revenuecat_package (Resource)
 
-A package within a RevenueCat offering.
+A package within a RevenueCat offering. Imports require `project_id/offering_id/package_id`: RevenueCat reads packages by project and package ID, while the provider retains `offering_id` so an imported package can be recreated under the same parent if replacement is required.
 
 ## Example Usage
 
@@ -27,14 +27,14 @@ resource "revenuecat_package" "monthly" {
 
 ### Required
 
-- `display_name` (String) Human-readable package name.
-- `lookup_key` (String) Stable package lookup key.
-- `offering_id` (String) Parent offering ID.
-- `project_id` (String) RevenueCat project ID.
+- `display_name` (String) Human-readable package name (1-1500 characters).
+- `lookup_key` (String) Stable package lookup key (1-200 characters).
+- `offering_id` (String) Parent offering ID (1-255 characters).
+- `project_id` (String) RevenueCat project ID (1-255 characters).
 
 ### Optional
 
-- `position` (Number) Package position within the offering.
+- `position` (Number) Optional package position within the offering. When omitted, RevenueCat chooses the position.
 
 ### Read-Only
 

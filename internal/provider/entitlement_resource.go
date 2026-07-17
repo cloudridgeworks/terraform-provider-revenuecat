@@ -1,4 +1,4 @@
-// Copyright Cloud Ridge Works
+// Copyright Cloud Ridge Works 2026
 // SPDX-License-Identifier: MPL-2.0
 
 package provider
@@ -47,10 +47,10 @@ func (r *EntitlementResource) Metadata(_ context.Context, req resource.MetadataR
 
 func (r *EntitlementResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{MarkdownDescription: "A RevenueCat entitlement.", Attributes: map[string]schema.Attribute{
-		"project_id":   schema.StringAttribute{Required: true, MarkdownDescription: "RevenueCat project ID.", PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()}},
+		"project_id":   schema.StringAttribute{Required: true, MarkdownDescription: "RevenueCat project ID (1-255 characters).", Validators: identifierValidators(), PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()}},
 		"id":           schema.StringAttribute{Computed: true, MarkdownDescription: "RevenueCat entitlement ID.", PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()}},
-		"lookup_key":   schema.StringAttribute{Required: true, MarkdownDescription: "Stable entitlement lookup key.", PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()}},
-		"display_name": schema.StringAttribute{Required: true, MarkdownDescription: "Human-readable entitlement name."},
+		"lookup_key":   schema.StringAttribute{Required: true, MarkdownDescription: "Stable entitlement lookup key (1-200 characters).", Validators: lookupKeyValidators(), PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()}},
+		"display_name": schema.StringAttribute{Required: true, MarkdownDescription: "Human-readable entitlement name (1-1500 characters).", Validators: displayNameValidators()},
 		"state":        schema.StringAttribute{Computed: true, MarkdownDescription: "RevenueCat lifecycle state."},
 		"created_at":   schema.Int64Attribute{Computed: true, MarkdownDescription: "Creation time in milliseconds since Unix epoch."},
 	}}

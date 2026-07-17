@@ -27,9 +27,9 @@ resource "revenuecat_entitlement_product" "web_monthly" {
 
 ### Required
 
-- `entitlement_id` (String) RevenueCat entitlement ID.
-- `product_id` (String) Existing RevenueCat product ID.
-- `project_id` (String) RevenueCat project ID.
+- `entitlement_id` (String) RevenueCat entitlement ID (1-255 characters).
+- `product_id` (String) Existing RevenueCat product ID (1-255 characters).
+- `project_id` (String) RevenueCat project ID (1-255 characters).
 
 ### Read-Only
 

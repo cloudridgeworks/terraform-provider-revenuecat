@@ -14,3 +14,12 @@ In plain English, describe your approach to addressing the issue linked above. F
 ## Changes to Security Controls
 
 Are there any changes to security controls (access controls, encryption, logging) in this pull request? If so, explain.
+
+## Contributor checklist
+
+- [ ] I added or updated tests for behavior changes.
+- [ ] I ran `make test`, `make testacc`, and `make build`.
+- [ ] I ran `make generate` and committed any generated documentation changes.
+- [ ] I removed API keys, project IDs, signing secrets, and customer data from the change.
+- [ ] I documented breaking changes and RevenueCat API limitations.
+- [ ] I agree to license my contribution under MPL 2.0 as described in `CONTRIBUTING.md`.

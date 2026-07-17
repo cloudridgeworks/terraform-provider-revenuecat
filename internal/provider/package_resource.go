@@ -1,4 +1,4 @@
-// Copyright Cloud Ridge Works
+// Copyright Cloud Ridge Works 2026
 // SPDX-License-Identifier: MPL-2.0
 
 package provider
@@ -9,11 +9,12 @@ import (
 	"net/http"
 
 	"github.com/cloudridgeworks/terraform-provider-revenuecat/internal/client"
+	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64default"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -48,13 +49,13 @@ func (r *PackageResource) Metadata(_ context.Context, req resource.MetadataReque
 }
 
 func (r *PackageResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
-	resp.Schema = schema.Schema{MarkdownDescription: "A package within a RevenueCat offering.", Attributes: map[string]schema.Attribute{
-		"project_id":   schema.StringAttribute{Required: true, MarkdownDescription: "RevenueCat project ID.", PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()}},
-		"offering_id":  schema.StringAttribute{Required: true, MarkdownDescription: "Parent offering ID.", PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()}},
+	resp.Schema = schema.Schema{MarkdownDescription: "A package within a RevenueCat offering. Imports require `project_id/offering_id/package_id`: RevenueCat reads packages by project and package ID, while the provider retains `offering_id` so an imported package can be recreated under the same parent if replacement is required.", Attributes: map[string]schema.Attribute{
+		"project_id":   schema.StringAttribute{Required: true, MarkdownDescription: "RevenueCat project ID (1-255 characters).", Validators: identifierValidators(), PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()}},
+		"offering_id":  schema.StringAttribute{Required: true, MarkdownDescription: "Parent offering ID (1-255 characters).", Validators: identifierValidators(), PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()}},
 		"id":           schema.StringAttribute{Computed: true, MarkdownDescription: "RevenueCat package ID.", PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()}},
-		"lookup_key":   schema.StringAttribute{Required: true, MarkdownDescription: "Stable package lookup key.", PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()}},
-		"display_name": schema.StringAttribute{Required: true, MarkdownDescription: "Human-readable package name."},
-		"position":     schema.Int64Attribute{Optional: true, Computed: true, Default: int64default.StaticInt64(1), MarkdownDescription: "Package position within the offering."},
+		"lookup_key":   schema.StringAttribute{Required: true, MarkdownDescription: "Stable package lookup key (1-200 characters).", Validators: lookupKeyValidators(), PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()}},
+		"display_name": schema.StringAttribute{Required: true, MarkdownDescription: "Human-readable package name (1-1500 characters).", Validators: displayNameValidators()},
+		"position":     schema.Int64Attribute{Optional: true, Computed: true, MarkdownDescription: "Optional package position within the offering. When omitted, RevenueCat chooses the position.", Validators: []validator.Int64{int64validator.AtLeast(1)}},
 		"created_at":   schema.Int64Attribute{Computed: true, MarkdownDescription: "Creation time in milliseconds since Unix epoch."},
 	}}
 }
@@ -65,12 +66,16 @@ func (r *PackageResource) Configure(_ context.Context, req resource.ConfigureReq
 
 func (r *PackageResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	var data PackageResourceModel
+	var config PackageResourceModel
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
+	resp.Diagnostics.Append(req.Config.Get(ctx, &config)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 	var remote packageResponse
-	err := r.client.Do(ctx, http.MethodPost, escaped("projects", data.ProjectID.ValueString(), "offerings", data.OfferingID.ValueString(), "packages"), map[string]any{"lookup_key": data.LookupKey.ValueString(), "display_name": data.DisplayName.ValueString(), "position": data.Position.ValueInt64()}, &remote)
+	body := map[string]any{"lookup_key": data.LookupKey.ValueString(), "display_name": data.DisplayName.ValueString()}
+	addConfiguredPosition(body, config.Position)
+	err := r.client.Do(ctx, http.MethodPost, escaped("projects", data.ProjectID.ValueString(), "offerings", data.OfferingID.ValueString(), "packages"), body, &remote)
 	if err != nil {
 		resp.Diagnostics.AddError("Unable to create RevenueCat package", err.Error())
 		return
@@ -96,12 +101,16 @@ func (r *PackageResource) Read(ctx context.Context, req resource.ReadRequest, re
 
 func (r *PackageResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	var data PackageResourceModel
+	var config PackageResourceModel
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
+	resp.Diagnostics.Append(req.Config.Get(ctx, &config)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 	var remote packageResponse
-	err := r.client.Do(ctx, http.MethodPost, escaped("projects", data.ProjectID.ValueString(), "packages", data.ID.ValueString()), map[string]any{"display_name": data.DisplayName.ValueString(), "position": data.Position.ValueInt64()}, &remote)
+	body := map[string]any{"display_name": data.DisplayName.ValueString()}
+	addConfiguredPosition(body, config.Position)
+	err := r.client.Do(ctx, http.MethodPost, escaped("projects", data.ProjectID.ValueString(), "packages", data.ID.ValueString()), body, &remote)
 	if err != nil {
 		resp.Diagnostics.AddError("Unable to update RevenueCat package", err.Error())
 		return
@@ -132,4 +141,10 @@ func setPackageState(data *PackageResourceModel, remote packageResponse) {
 	data.DisplayName = types.StringValue(remote.DisplayName)
 	data.Position = types.Int64Value(remote.Position)
 	data.CreatedAt = types.Int64Value(remote.CreatedAt)
+}
+
+func addConfiguredPosition(body map[string]any, position types.Int64) {
+	if !position.IsNull() && !position.IsUnknown() {
+		body["position"] = position.ValueInt64()
+	}
 }

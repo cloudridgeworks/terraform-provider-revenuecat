@@ -1,0 +1,36 @@
+name: Feature request
+description: Propose a provider capability or resource.
+title: "feature: "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Use case
+      description: Explain the declarative workflow this would enable.
+    validations:
+      required: true
+  - type: textarea
+    id: api-support
+    attributes:
+      label: RevenueCat API v2 support
+      description: Link the relevant official API v2 endpoint or explain the upstream limitation.
+    validations:
+      required: true
+  - type: textarea
+    id: configuration
+    attributes:
+      label: Proposed Terraform configuration
+      render: hcl
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+  - type: checkboxes
+    id: confirmation
+    attributes:
+      label: Confirmation
+      options:
+        - label: I searched existing issues and the README support matrix.
+          required: true
